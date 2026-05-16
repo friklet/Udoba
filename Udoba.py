@@ -1,19 +1,39 @@
 import requests
 import tkinter as tk
 
-API_KEY = "b6907d289e10d714a6e88b30761fae22"
-
 def update():
-    data = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q=Omsk&appid={API_KEY}&units=metric&lang=ru").json()
-    temp = data['main']['temp']
+    # Координаты Омска
+    lat, lon = 54.9893, 73.3682
     
-    if temp > 25: wear = "🩳 Шорты, майка"
-    elif temp > 15: wear = "👖 Джинсы, футболка"
-    elif temp > 5: wear = "🧥 Куртка, джинсы"
-    elif temp > -10: wear = "🧣 Шапка, пуховик"
-    else: wear = "🥶 Всё тёплое!"
+    # Простой запрос к Яндекс Погоде без ключа
+    url = f"https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}"
     
-    label.config(text=f"🌡 {temp}°C\n{data['weather'][0]['description']}\n\n👔 {wear}")
+    try:
+        data = requests.get(url).json()
+        temp = data['fact']['temp']
+        desc = data['fact']['condition']
+        
+        # Переводим описание
+        conditions = {
+            'clear': '☀ Ясно',
+            'partly-cloudy': '⛅ Малооблачно', 
+            'cloudy': '☁ Облачно',
+            'overcast': '☁ Пасмурно',
+            'rain': '🌧 Дождь',
+            'snow': '❄ Снег'
+        }
+        desc_ru = conditions.get(desc, desc)
+        
+        # Одежда
+        if temp > 25: wear = "🩳 Шорты, майка"
+        elif temp > 15: wear = "👖 Джинсы, футболка" 
+        elif temp > 5: wear = "🧥 Куртка, джинсы"
+        elif temp > -10: wear = "🧣 Шапка, пуховик"
+        else: wear = "🥶 Всё тёплое!"
+        
+        label.config(text=f"🌡 {temp}°C\n{desc_ru}\n\n👔 {wear}")
+    except:
+        label.config(text="❌ Нет данных\nПроверь интернет!")
 
 win = tk.Tk()
 win.title("Погода Омск")
