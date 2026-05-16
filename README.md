@@ -1,1 +1,1 @@
-# Udoba
+# pip install python-telegram-bot requests
